@@ -2,7 +2,9 @@ var app = require('app'); // Module to control application life.
 var BrowserWindow = require('browser-window'); // Module to create native browser window.
 var dialog = require('dialog');
 var ipc = require('ipc');
-// Report crashes to our server.
+var path = require('path');
+
+  // Report crashes to our server.
 require('crash-reporter').start();
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the javascript object is GCed.
@@ -33,9 +35,9 @@ app.on('ready', function() {
     event.returnValue = "OK";
   });
   // and load the index.html of the app.
-  mainWindow.loadUrl('file://' + __dirname + '/index.html');
-  //mainWindow.loadUrl('file://' + __dirname + '/webrtc.html');
-  //mainWindow.toggleDevTools();
+  var targetPath = path.resolve(__dirname, '..', '..', 'static', 'index.html');
+  mainWindow.loadUrl('file://'+targetPath);
+
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {
     // Dereference the window object, usually you would store windows

@@ -1,122 +1,130 @@
 <!DOCTYPE html>
-<html style="background: #fff; width: 100%; height: 100%;">
-
+<html>
 <head>
-  <title></title>
-  <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self'; style-src 'self' 'unsafe-inline';">
-  <!--<script src="index.js"></script>-->
-  <script src="tmlib.min.js"></script>
+  <meta charset="UTF-8">
+  <title>ひらがなれんしゅう</title>
+  <script src="./lib/tmlib.min.js"></script>
   <script>
-    tm.define("TitleScene", {
-      superClass: "tm.app.Scene",
-      init: function() {
-        this.superInit();
+  tm.define("TitleScene", {
+    superClass: "tm.app.Scene",
+    init: function() {
+      this.superInit();
 
-        // ボタンを作る
-        var button = tm.app.GlossyButton(500, 160, "red", "はじめる");
-        // 表示位置
-        button.position.set(300, 400);
-        button.addChildTo(this);
-        button.label.setFontSize(80);
-        button.addEventListener('pointingstart', function(e) {
-          e.app.replaceScene(MainScene());
-        });
+      // ボタンを作る
+      var button = tm.app.GlossyButton(500, 160, "red", "はじめる");
+      // 表示位置
+      button.position.set(1920/2|0, 400);
+      button.addChildTo(this);
+      button.label.setFontSize(80);
+      button.addEventListener('pointingstart', function(e) {
+        e.app.replaceScene(MainScene());
+      });
 
-        // 画面(シーンの描画箇所)をタッチした時の動作
-        this.addEventListener("pointingend", function(e) {
-          // シーンの遷移
-          //e.app.replaceScene(MainScene());
-        });
-      },
-    });
+      // 画面(シーンの描画箇所)をタッチした時の動作
+      this.addEventListener("click", function(e) {
+        // シーンの遷移
+        //e.app.replaceScene(MainScene());
+      });
+    },
+  });
 
-    // main
+  tm.define("MainScene", {
+    superClass: "tm.app.Scene",
+    init: function() {
+      var savedIdx=-1;
+      // 練習するひらがな
+      var hiraganaList = ['あ', 'い', 'う', 'え', 'お','な'];
 
-    tm.main(function() {
-      var app = tm.display.CanvasApp("#world");
-      app.resize(640, 960);
-      app.fitWindow();
-
-
-
-      app.replaceScene(TitleScene());
-
-      // 実行
-      app.run();
-    });
-
-    tm.define("MainScene", {
-      superClass: "tm.app.Scene",
-      init: function() {
-        // 練習するひらがな
-        var hiraganaList = ['あ', 'い', 'う', 'え', 'お'];
-
-        function speakHiragana() {
-          return setTimeout(function() {
-            return;
-            if (!SpeechSynthesisUtterance) {
-              var msg = new SpeechSynthesisUtterance();
-              msg.volume = 1;
-              msg.rate = 1;
-              msg.pitch = 2;
-              // 現在表示中の文字を取得
-              msg.text = title._text; // しゃべる内容
-              msg.lang = "ja-JP"; // en-US or ja-UP
-
-              // テキストスピーチ開始
-              speechSynthesis.speak(msg);
-            }
-          }, 3000);
+      function getNewIdx() {
+        var idx = Math.floor(Math.random() * ((hiraganaList.length - 1)) + 1);
+        while(savedIdx == idx)  {
+          idx = Math.floor(Math.random() * ((hiraganaList.length - 1)) + 1);
         }
-        this.superInit();
-
-        var gradation = tm.graphics.LinearGradient(0, 0, 640, 890)
-          .addColorStopList(Array.range(0, 20).map(function(i) {
-            return {
-              offset: i / 20,
-              color: "hsl({0}, 80%, 80%)".format(360 * i / 20),
-            };
-          }))
-          .toStyle();
-        var myGrRect = tm.display.RectangleShape(640, 890, {
-          fillStyle: gradation
-        }).addChildTo(this);
-        myGrRect.setPosition(320, 200);
-
-        var title = tm.display.Label("あ").addChildTo(myGrRect);
-        title.$extend({
-          x: 10,
-          y: 110,
-          fontSize: 675, // <- フォントサイズの指定
-          align: "center",
-          baseline: "middle",
-          fontFamily: "sans-serif",
-          shadowBlur: 4,
-        });
-
-        // ボタンを作る
-        var button = tm.app.GlossyButton(500, 260, "green", "つぎ");
-        // 表示位置
-        button.position.set(300, 800);
-        button.addChildTo(this);
-        button.label.setFontSize(80);
-
-        button.onpointingstart = function() {
-
-          idx = Math.floor(Math.random() * ((hiraganaList.length - 1)) - 1);
-
-          title.text = hiraganaList[idx];
-          //update(this);
-          alert(title._text);
-          speakHiragana();
-        };
+        return idx;
       }
-    });
+
+      function speakHiragana() {
+        return setTimeout(function() {
+          //return;
+
+          var msg = new SpeechSynthesisUtterance();
+          msg.volume = 1;
+          msg.rate = 1;
+          msg.pitch = 2;
+          // 現在表示中の文字を取得
+          msg.text = title._text; // しゃべる内容
+          msg.lang = "ja-JP"; // en-US or ja-UP
+
+          // テキストスピーチ開始
+          speechSynthesis.speak(msg);
+
+        }, 3000);
+      }
+      this.superInit();
+
+      var gradation = tm.graphics.LinearGradient(0, 0, 1920, 1080-250)
+      .addColorStopList(Array.range(0, 20).map(function(i) {
+        return {
+          offset: i / 20,
+          color: "hsl({0}, 80%, 80%)".format(360 * i / 20),
+        };
+      }))
+      .toStyle();
+      var myGrRect = tm.display.RectangleShape(1920, 1080, {
+        fillStyle: gradation
+      }).addChildTo(this);
+      myGrRect.setPosition(1920/2|0, 1080/2|0);
+
+      var title = tm.display.Label("あ").addChildTo(myGrRect);
+      speakHiragana();
+      title.$extend({
+        x: 0,
+        y: 0,
+        fontSize: 800, // <- フォントサイズの指定
+        align: "center",
+        baseline: "middle",
+        fontFamily: "sans-serif",
+        shadowBlur: 4,
+      });
+
+      // ボタンを作る
+      var button = tm.app.GlossyButton(1500, 150, "green", "つぎ");
+      // 表示位置
+      button.position.set(1920/2|0, 1000);
+      button.addChildTo(this);
+      button.label.setFontSize(80);
+
+      button.onpointingstart = function() {
+
+
+        idx = getNewIdx();
+        title.text = hiraganaList[idx];
+        //update(this);
+        //alert(title._text);
+        speakHiragana();
+      };
+    }
+  });
+
+  // main
+
+  tm.main(function() {
+    var app = tm.display.CanvasApp("#world");
+    app.resize(1920, 1080);
+    app.fitWindow();
+
+
+
+    app.replaceScene(TitleScene());
+
+    // 実行
+    app.run();
+  });
+
+
   </script>
 </head>
-
 <body>
-  <canvas id="world"></canvas>
+  <canvas id="world"></canvas
 </body>
-
 </html>
