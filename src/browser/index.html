@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ひらがなれんしゅう</title>
+  <script src="./tmlib.min.js"></script>
+  <script>
+  tm.define("TitleScene", {
+    superClass: "tm.app.Scene",
+    init: function() {
+      this.superInit();
+
+      // ボタンを作る
+      var button = tm.app.GlossyButton(500, 160, "red", "はじめる");
+      // 表示位置
+      button.position.set(300, 400);
+      button.addChildTo(this);
+      button.label.setFontSize(80);
+      button.addEventListener('pointingstart', function(e) {
+        e.app.replaceScene(MainScene());
+      });
+
+      // 画面(シーンの描画箇所)をタッチした時の動作
+      this.addEventListener("pointingend", function(e) {
+        // シーンの遷移
+        //e.app.replaceScene(MainScene());
+      });
+    },
+  });
+
+  // main
+
+  tm.main(function() {
+    var app = tm.display.CanvasApp("#world");
+    app.resize(640, 960);
+    app.fitWindow();
+
+
+
+    app.replaceScene(TitleScene());
+
+    // 実行
+    app.run();
+  });
+
+  tm.define("MainScene", {
+    superClass: "tm.app.Scene",
+    init: function() {
+      // 練習するひらがな
+      var hiraganaList = ['あ', 'い', 'う', 'え', 'お','な'];
+
+      function speakHiragana() {
+        return setTimeout(function() {
+          //return;
+
+            var msg = new SpeechSynthesisUtterance();
+            msg.volume = 1;
+            msg.rate = 1;
+            msg.pitch = 2;
+            // 現在表示中の文字を取得
+            msg.text = title._text; // しゃべる内容
+            msg.lang = "ja-JP"; // en-US or ja-UP
+
+            // テキストスピーチ開始
+            speechSynthesis.speak(msg);
+
+        }, 3000);
+      }
+      this.superInit();
+
+      var gradation = tm.graphics.LinearGradient(0, 0, 640, 890)
+      .addColorStopList(Array.range(0, 20).map(function(i) {
+        return {
+          offset: i / 20,
+          color: "hsl({0}, 80%, 80%)".format(360 * i / 20),
+        };
+      }))
+      .toStyle();
+      var myGrRect = tm.display.RectangleShape(640, 890, {
+        fillStyle: gradation
+      }).addChildTo(this);
+      myGrRect.setPosition(320, 200);
+
+      var title = tm.display.Label("あ").addChildTo(myGrRect);
+      speakHiragana();
+      title.$extend({
+        x: 10,
+        y: 110,
+        fontSize: 675, // <- フォントサイズの指定
+        align: "center",
+        baseline: "middle",
+        fontFamily: "sans-serif",
+        shadowBlur: 4,
+      });
+
+      // ボタンを作る
+      var button = tm.app.GlossyButton(500, 260, "green", "つぎ");
+      // 表示位置
+      button.position.set(300, 800);
+      button.addChildTo(this);
+      button.label.setFontSize(80);
+
+      button.onpointingstart = function() {
+
+        idx = Math.floor(Math.random() * ((hiraganaList.length - 1)) + 1);
+
+        title.text = hiraganaList[idx];
+        //update(this);
+        //alert(title._text);
+        speakHiragana();
+      };
+    }
+  });
+  </script>
+</head>
+<body>
+  <canvas id="world"></canvas
+</body>
+</html>
